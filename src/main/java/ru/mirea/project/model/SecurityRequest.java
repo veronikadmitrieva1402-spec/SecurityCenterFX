@@ -26,7 +26,21 @@ public class SecurityRequest {
     public RequestStatus getStatus() { return status; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 
-    public void setStatus(RequestStatus status) { this.status = status; }
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public void setObjectAddress(String objectAddress) {
+        this.objectAddress = objectAddress;
+    }
+
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
+    }
+
+    public void setStatus(RequestStatus status) {
+        this.status = status;
+    }
 
     @Override
     public String toString() {

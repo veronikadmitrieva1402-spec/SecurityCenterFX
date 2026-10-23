@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ru.mirea.project.controller.AddRequestController"
+      spacing="10" prefWidth="400">
+
+    <padding><Insets top="15" right="15" bottom="15" left="15"/></padding>
+
+    <Label text="Добавление новой заявки" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+    <Label text="Клиент:"/>
+    <ComboBox fx:id="clientCombo" prefWidth="350" promptText="Выберите клиента"/>
+
+    <Label text="Адрес объекта:"/>
+    <TextField fx:id="addressField" promptText="ул. Ленина, д. 10"/>
+
+    <Label text="Тип охраны:"/>
+    <TextField fx:id="typeField" promptText="Физическая охрана"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <padding><Insets top="15"/></padding>
+        <Button text="Сохранить" onAction="#onSave" defaultButton="true"/>
+        <Button text="Отмена" onAction="#onCancel" cancelButton="true"/>
+    </HBox>
+</VBox>

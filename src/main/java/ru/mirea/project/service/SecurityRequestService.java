@@ -79,6 +79,15 @@ public class SecurityRequestService {
         }
     }
 
+    public void updateRequest(SecurityRequest request) {
+        try {
+            repository.update(request);
+            System.out.println("Заявка обновлена.");
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка БД при обновлении: " + e.getMessage());
+        }
+    }
+
     public void deleteRequest(int id) {
         try {
             SecurityRequest req = repository.findById(id);
