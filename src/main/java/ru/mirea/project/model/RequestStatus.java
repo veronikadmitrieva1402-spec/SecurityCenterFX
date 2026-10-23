@@ -1,4 +1,8 @@
 package ru.mirea.project.model;
 
-public class RequestStatus {
+public enum RequestStatus {
+    NEW,
+    IN_PROGRESS,
+    DONE,
+    CANCELLED
 }

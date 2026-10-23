@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ru.mirea.project.controller.MainController">
+
+    <top>
+        <ToolBar>
+            <Button text="Добавить" onAction="#onAdd"/>
+            <Button text="Редактировать" onAction="#onEdit"/>
+            <Button text="Удалить" onAction="#onDelete"/>
+            <Button text="Обновить" onAction="#onRefresh"/>
+            <TextField fx:id="searchField" promptText="Поиск по адресу..."/>
+            <Button text="Найти" onAction="#onSearch"/>
+            <ComboBox fx:id="statusFilter" promptText="Фильтр по статусу"/>
+        </ToolBar>
+    </top>
+
+    <center>
+        <TableView fx:id="requestTable">
+            <columns>
+                <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                <TableColumn fx:id="colAddress" text="Адрес" prefWidth="200"/>
+                <TableColumn fx:id="colType" text="Тип охраны" prefWidth="150"/>
+                <TableColumn fx:id="colStatus" text="Статус" prefWidth="100"/>
+                <TableColumn fx:id="colCreatedAt" text="Дата" prefWidth="150"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <bottom>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Button text="Статистика" onAction="#onStatistics"/>
+            <Button text="Экспорт в CSV" onAction="#onExport"/>
+        </HBox>
+    </bottom>
+</BorderPane>
