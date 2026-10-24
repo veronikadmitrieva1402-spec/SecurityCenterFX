@@ -55,9 +55,21 @@ public class EditRequestController {
                 return;
             }
 
+            String address = addressField.getText();
+            if (address == null || address.trim().isEmpty()) {
+                showAlert("Ошибка: Адрес объекта не может быть пустым!");
+                return;
+            }
+
+            String type = typeField.getText();
+            if (type == null || type.trim().isEmpty()) {
+                showAlert("Ошибка: Укажите тип охраны!");
+                return;
+            }
+
             currentRequest.setUserId(selectedUser.getId());
-            currentRequest.setObjectAddress(addressField.getText());
-            currentRequest.setServiceType(typeField.getText());
+            currentRequest.setObjectAddress(address);
+            currentRequest.setServiceType(type);
 
             requestService.updateRequest(currentRequest);
 

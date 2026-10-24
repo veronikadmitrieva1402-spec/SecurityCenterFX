@@ -48,12 +48,19 @@ public class AddRequestController {
             }
 
             String address = addressField.getText();
-            String type = typeField.getText();
+            if (address == null || address.trim().isEmpty()) {
+                showAlert("Ошибка: Адрес объекта не может быть пустым!");
+                return;
+            }
 
-            // Вызываем сервис для создания заявки
+            String type = typeField.getText();
+            if (type == null || type.trim().isEmpty()) {
+                showAlert("Ошибка: Укажите тип охраны!");
+                return;
+            }
+
             requestService.createRequest(selectedUser.getId(), address, type);
 
-            // Закрываем окно
             Stage stage = (Stage) addressField.getScene().getWindow();
             stage.close();
 

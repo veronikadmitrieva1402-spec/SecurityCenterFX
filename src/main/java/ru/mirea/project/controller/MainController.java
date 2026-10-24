@@ -2,19 +2,24 @@ package ru.mirea.project.controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.scene.control.*;
+import java.io.File;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import ru.mirea.project.model.SecurityRequest;
 import ru.mirea.project.service.SecurityRequestService;
+import ru.mirea.project.util.ExcelExporter;
 
 public class MainController {
 
@@ -29,24 +34,27 @@ public class MainController {
 
     private final SecurityRequestService service = new SecurityRequestService();
     private final ObservableList<SecurityRequest> data = FXCollections.observableArrayList();
+    private FilteredList<SecurityRequest> filteredData;
 
     @FXML
     public void initialize() {
-        // Настройка столбцов (связываем с полями класса SecurityRequest)
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colAddress.setCellValueFactory(new PropertyValueFactory<>("objectAddress"));
         colType.setCellValueFactory(new PropertyValueFactory<>("serviceType"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colCreatedAt.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
 
-        // Заполняем ComboBox статусов
         statusFilter.getItems().addAll("Все", "NEW", "IN_PROGRESS", "DONE", "CANCELLED");
         statusFilter.getSelectionModel().selectFirst();
 
-        statusFilter.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters());
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> applyFilters());
+        // Инициализируем FilteredList на основе data
+        filteredData = new FilteredList<>(data, p -> true);
+        requestTable.setItems(filteredData);
 
-        // Загружаем данные
+        // Слушатели для поиска и фильтра
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> applyFilters());
+        statusFilter.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters());
+
         loadData();
     }
 
@@ -54,18 +62,25 @@ public class MainController {
         String query = searchField.getText();
         String status = statusFilter.getValue();
 
-        List<SecurityRequest> filtered = service.getAllRequests().stream()
-                .filter(r -> query == null || query.isEmpty() || r.getObjectAddress().toLowerCase().contains(query.toLowerCase()))
-                .filter(r -> status == null || status.equals("Все") || r.getStatus().name().equals(status))
-                .collect(Collectors.toList());
+        filteredData.setPredicate(request -> {
+            if (query != null && !query.isEmpty()) {
+                if (!request.getObjectAddress().toLowerCase().contains(query.toLowerCase())) {
+                    return false;
+                }
+            }
 
-        data.setAll(filtered);
+            if (status != null && !status.equals("Все")) {
+                if (!request.getStatus().name().equals(status)) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
     }
 
     private void loadData() {
-        data.clear();
-        data.addAll(service.getAllRequests());
-        requestTable.setItems(data);
+        data.setAll(service.getAllRequests());
     }
 
     @FXML
@@ -75,7 +90,7 @@ public class MainController {
 
     @FXML
     private void onSearch() {
-        String query = searchField.getText();
+        applyFilters();
     }
 
     @FXML
@@ -151,10 +166,49 @@ public class MainController {
 
     @FXML
     private void onStatistics() {
+        List<SecurityRequest> all = service.getAllRequests();
+
+        long total = all.size();
+        long newCount = all.stream().filter(r -> r.getStatus().name().equals("NEW")).count();
+        long inProgress = all.stream().filter(r -> r.getStatus().name().equals("IN_PROGRESS")).count();
+        long done = all.stream().filter(r -> r.getStatus().name().equals("DONE")).count();
+        long cancelled = all.stream().filter(r -> r.getStatus().name().equals("CANCELLED")).count();
+
+        String message = String.format(
+                "Всего заявок: %d%n" +
+                        "Новых: %d%n" +
+                        "В работе: %d%n" +
+                        "Выполнено: %d%n" +
+                        "Отменено: %d",
+                total, newCount, inProgress, done, cancelled
+        );
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Статистика");
+        alert.setHeaderText("Показатели системы");
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     @FXML
     private void onExport() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Сохранить данные в CSV");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"));
+        fileChooser.setInitialFileName("requests_export.csv");
+
+        File file = fileChooser.showSaveDialog(requestTable.getScene().getWindow());
+
+        if (file != null) {
+            try {
+                // Используем ваш существующий ExcelExporter (он умеет писать CSV)
+                ExcelExporter.exportToCsv(data, file.getAbsolutePath());
+
+                showAlert("Данные успешно экспортированы в файл:\n" + file.getAbsolutePath());
+            } catch (Exception e) {
+                showAlert("Ошибка при экспорте: " + e.getMessage());
+            }
+        }
     }
 
     private void showAlert(String message) {
