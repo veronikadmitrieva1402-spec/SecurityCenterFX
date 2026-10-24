@@ -19,7 +19,7 @@
     <TextField fx:id="addressField" promptText="ул. Ленина, д. 10"/>
 
     <Label text="Тип охраны:"/>
-    <TextField fx:id="typeField" promptText="Физическая охрана"/>
+    <ComboBox fx:id="typeCombo" prefWidth="350" promptText="Выберите тип охраны"/>
 
     <HBox spacing="10" alignment="CENTER_RIGHT">
         <padding><Insets top="15"/></padding>

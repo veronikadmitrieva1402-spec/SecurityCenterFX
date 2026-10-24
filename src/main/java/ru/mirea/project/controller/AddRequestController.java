@@ -15,7 +15,7 @@ public class AddRequestController {
 
     @FXML private ComboBox<User> clientCombo;
     @FXML private TextField addressField;
-    @FXML private TextField typeField;
+    @FXML private ComboBox<String> typeCombo;
 
     private final UserService userService = new UserService();
     private final SecurityRequestService requestService = new SecurityRequestService();
@@ -24,6 +24,7 @@ public class AddRequestController {
     public void initialize() {
         // Загружаем клиентов в ComboBox
         clientCombo.setItems(FXCollections.observableArrayList(userService.getAllUsers()));
+        typeCombo.getItems().addAll("Физическая охрана", "Пультовая охрана");
 
         // Настраиваем, как клиент будет отображаться в выпадающем списке (ФИО)
         clientCombo.setConverter(new StringConverter<>() {
@@ -53,9 +54,9 @@ public class AddRequestController {
                 return;
             }
 
-            String type = typeField.getText();
-            if (type == null || type.trim().isEmpty()) {
-                showAlert("Ошибка: Укажите тип охраны!");
+            String type = typeCombo.getValue();
+            if (type == null || type.isEmpty()) {
+                showAlert("Ошибка: Выберите тип охраны!");
                 return;
             }
 

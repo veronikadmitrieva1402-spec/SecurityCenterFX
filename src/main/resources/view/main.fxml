@@ -12,9 +12,12 @@
             <Button text="Редактировать" onAction="#onEdit"/>
             <Button text="Удалить" onAction="#onDelete"/>
             <Button text="Обновить" onAction="#onRefresh"/>
+            <Button text="Сорт. по дате" onAction="#onSortByDate"/>
+            <Button text="Сорт. по ID" onAction="#onSortById"/>
             <TextField fx:id="searchField" promptText="Поиск по адресу..."/>
             <Button text="Найти" onAction="#onSearch"/>
             <ComboBox fx:id="statusFilter" promptText="Фильтр по статусу"/>
+            <ComboBox fx:id="typeFilter" promptText="Тип охраны"/>
         </ToolBar>
     </top>
 

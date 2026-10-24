@@ -31,10 +31,14 @@ public class MainController {
     @FXML private TableColumn<SecurityRequest, String> colCreatedAt;
     @FXML private TextField searchField;
     @FXML private ComboBox<String> statusFilter;
+    @FXML private ComboBox<String> typeFilter;
 
     private final SecurityRequestService service = new SecurityRequestService();
     private final ObservableList<SecurityRequest> data = FXCollections.observableArrayList();
     private FilteredList<SecurityRequest> filteredData;
+
+    private boolean sortByIdAscending = true;
+    private boolean sortByDateAscending = true;
 
     @FXML
     public void initialize() {
@@ -46,6 +50,8 @@ public class MainController {
 
         statusFilter.getItems().addAll("Все", "NEW", "IN_PROGRESS", "DONE", "CANCELLED");
         statusFilter.getSelectionModel().selectFirst();
+        typeFilter.getItems().addAll("Все", "Физическая охрана", "Пультовая охрана");
+        typeFilter.getSelectionModel().selectFirst();
 
         // Инициализируем FilteredList на основе data
         filteredData = new FilteredList<>(data, p -> true);
@@ -54,6 +60,7 @@ public class MainController {
         // Слушатели для поиска и фильтра
         searchField.textProperty().addListener((obs, oldVal, newVal) -> applyFilters());
         statusFilter.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters());
+        typeFilter.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters());
 
         loadData();
     }
@@ -61,6 +68,7 @@ public class MainController {
     private void applyFilters() {
         String query = searchField.getText();
         String status = statusFilter.getValue();
+        String type = typeFilter.getValue();
 
         filteredData.setPredicate(request -> {
             if (query != null && !query.isEmpty()) {
@@ -71,6 +79,12 @@ public class MainController {
 
             if (status != null && !status.equals("Все")) {
                 if (!request.getStatus().name().equals(status)) {
+                    return false;
+                }
+            }
+
+            if (type != null && !type.equals("Все")) {
+                if (!request.getServiceType().equals(type)) {
                     return false;
                 }
             }
@@ -91,6 +105,26 @@ public class MainController {
     @FXML
     private void onSearch() {
         applyFilters();
+    }
+
+    @FXML
+    private void onSortByDate() {
+        if (sortByDateAscending) {
+            data.sort((r1, r2) -> r1.getCreatedAt().compareTo(r2.getCreatedAt()));
+        } else {
+            data.sort((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()));
+        }
+        sortByDateAscending = !sortByDateAscending;
+    }
+
+    @FXML
+    private void onSortById() {
+        if (sortByIdAscending) {
+            data.sort((r1, r2) -> Integer.compare(r1.getId(), r2.getId()));
+        } else {
+            data.sort((r1, r2) -> Integer.compare(r2.getId(), r1.getId()));
+        }
+        sortByIdAscending = !sortByIdAscending;
     }
 
     @FXML

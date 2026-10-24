@@ -17,7 +17,8 @@ public class EditRequestController {
 
     @FXML private ComboBox<User> clientCombo;
     @FXML private TextField addressField;
-    @FXML private TextField typeField;
+    @FXML private ComboBox<String> typeCombo;
+    @FXML private ComboBox<RequestStatus> statusCombo;
 
     private final UserService userService = new UserService();
     private final SecurityRequestService requestService = new SecurityRequestService();
@@ -30,13 +31,17 @@ public class EditRequestController {
             @Override public String toString(User user) { return user == null ? "" : user.getFullName(); }
             @Override public User fromString(String string) { return null; }
         });
+        statusCombo.getItems().addAll(RequestStatus.values());
+        typeCombo.getItems().addAll("Физическая охрана", "Пультовая охрана");
     }
 
     public void setRequest(SecurityRequest request) {
         this.currentRequest = request;
 
         addressField.setText(request.getObjectAddress());
-        typeField.setText(request.getServiceType());
+        typeCombo.setValue(request.getServiceType());
+
+        statusCombo.setValue(request.getStatus());
 
         for (User user : clientCombo.getItems()) {
             if (user.getId() == request.getUserId()) {
@@ -61,15 +66,17 @@ public class EditRequestController {
                 return;
             }
 
-            String type = typeField.getText();
-            if (type == null || type.trim().isEmpty()) {
-                showAlert("Ошибка: Укажите тип охраны!");
+            String type = typeCombo.getValue();
+            if (type == null || type.isEmpty()) {
+                showAlert("Ошибка: Выберите тип охраны!");
                 return;
             }
 
             currentRequest.setUserId(selectedUser.getId());
             currentRequest.setObjectAddress(address);
             currentRequest.setServiceType(type);
+
+            currentRequest.setStatus(statusCombo.getValue());
 
             requestService.updateRequest(currentRequest);
 
